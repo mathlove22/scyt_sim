@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>스키테일 암호 시뮬레이션</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Nanum Gothic', Arial, sans-serif;
@@ -52,6 +53,7 @@
             border-radius: 4px;
             box-sizing: border-box;
             font-size: 16px;
+            font-family: 'Nanum Gothic', Arial, sans-serif;
         }
 
         button {
@@ -63,6 +65,7 @@
             cursor: pointer;
             font-size: 16px;
             transition: background-color 0.3s;
+            font-family: 'Nanum Gothic', Arial, sans-serif;
         }
 
         button:hover {
@@ -121,6 +124,8 @@
             align-items: center;
             justify-content: center;
             transition: transform 0.5s ease;
+            font-family: 'Nanum Gothic', Arial, sans-serif;
+            box-sizing: border-box; /* Ensure padding doesn't affect dimensions */
         }
 
         .unwrapped {
@@ -133,8 +138,8 @@
 
         .unwrapped .letter {
             position: relative;
-            width: 20px;
-            height: 20px;
+            width: 25px; /* Increased width to handle wider characters */
+            height: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -154,6 +159,7 @@
             border-radius: 5px;
             border-left: 5px solid #3498db;
             margin: 20px 0;
+            font-family: 'Nanum Gothic', Arial, sans-serif;
         }
 
         .steps {
@@ -182,6 +188,7 @@
             text-align: center;
             line-height: 20px;
             font-size: 12px;
+            font-family: 'Nanum Gothic', Arial, sans-serif;
         }
 
         .grid-example {
@@ -328,25 +335,19 @@
 
             // 암호화 함수 (올바른 스키테일 방식 - 세로로 작성, 가로로 읽기)
             function encrypt(text, cols) {
-                const cleanText = text.replace(/ /g, ''); // 공백 제거
-                // 세로로 작성하기 위한 행 수 계산 (열별로 몇 개가 들어갈 수 있는지)
+                const cleanText = text; // 띄어쓰기 제거 안함
                 const rows = Math.ceil(cleanText.length / cols);
-                // 초기 그리드 생성
                 const grid = Array(rows).fill().map(() => Array(cols).fill(' '));
-                // 세로 방향으로 문자 채우기
                 let charIndex = 0;
                 for (let j = 0; j < cols && charIndex < cleanText.length; j++) {
                     for (let i = 0; i < rows && charIndex < cleanText.length; i++) {
                         grid[i][j] = cleanText[charIndex++];
                     }
                 }
-                // 가로 방향으로 읽기 (암호문 생성)
                 let result = '';
                 for (let i = 0; i < rows; i++) {
                     for (let j = 0; j < cols; j++) {
-                        if (grid[i][j] !== ' ') {
-                            result += grid[i][j];
-                        }
+                        result += grid[i][j];
                     }
                 }
                 return result;
@@ -354,12 +355,9 @@
 
             // 복호화 함수 (가로로 작성, 세로로 읽기)
             function decrypt(cipher, cols) {
-                // 복호화는 암호화의 역과정
                 const totalChars = cipher.length;
                 const rows = Math.ceil(totalChars / cols);
-                // 결과를 담을 그리드 생성
                 const grid = Array(rows).fill().map(() => Array(cols).fill(' '));
-                // 가로 방향으로 채우기
                 let charIndex = 0;
                 for (let i = 0; i < rows; i++) {
                     for (let j = 0; j < cols; j++) {
@@ -368,13 +366,10 @@
                         }
                     }
                 }
-                // 세로 방향으로 읽기
                 let result = '';
                 for (let j = 0; j < cols; j++) {
                     for (let i = 0; i < rows; i++) {
-                        if (grid[i][j] !== ' ') {
-                            result += grid[i][j];
-                        }
+                        result += grid[i][j];
                     }
                 }
                 return result;
@@ -384,14 +379,12 @@
             function visualizeGrid(text, cols) {
                 const rows = Math.ceil(text.length / cols);
                 const grid = Array(rows).fill().map(() => Array(cols).fill(' '));
-                // 세로 방향으로 문자 채우기
                 let charIndex = 0;
                 for (let j = 0; j < cols && charIndex < text.length; j++) {
                     for (let i = 0; i < rows && charIndex < text.length; i++) {
                         grid[i][j] = text[charIndex++];
                     }
                 }
-                // 그리드 시각화
                 gridContent.innerHTML = '<h3>세로로 작성된 메시지:</h3>';
                 const gridElement = document.createElement('div');
                 gridElement.className = 'grid';
@@ -407,24 +400,20 @@
                     gridElement.appendChild(rowElement);
                 }
                 gridContent.appendChild(gridElement);
-                // 가로로 읽는 방식을 시각화
                 const readOrderElement = document.createElement('h3');
                 readOrderElement.textContent = '가로로 읽은 암호문:';
                 gridContent.appendChild(readOrderElement);
                 const cipherElement = document.createElement('div');
                 cipherElement.className = 'grid-row';
-                // 가로 방향으로 읽기
                 let cipher = '';
                 for (let i = 0; i < rows; i++) {
                     for (let j = 0; j < cols; j++) {
-                        if (grid[i][j] !== ' ') {
-                            cipher += grid[i][j];
-                            const cellElement = document.createElement('div');
-                            cellElement.className = 'grid-cell';
-                            cellElement.textContent = grid[i][j];
-                            cellElement.style.backgroundColor = '#e0f7fa';
-                            cipherElement.appendChild(cellElement);
-                        }
+                        cipher += grid[i][j];
+                        const cellElement = document.createElement('div');
+                        cellElement.className = 'grid-cell';
+                        cellElement.textContent = grid[i][j];
+                        cellElement.style.backgroundColor = '#e0f7fa';
+                        cipherElement.appendChild(cellElement);
                     }
                 }
                 gridContent.appendChild(cipherElement);
@@ -433,21 +422,18 @@
 
             // 스키테일에 문자 배치 (세로 방향으로 작성)
             function placeLettersOnScytale(text, cols) {
-                const cleanText = text.replace(/ /g, ''); // 공백 제거
+                const cleanText = text; // 띄어쓰기 제거 안함
                 letterWrap.innerHTML = '';
                 unwrapped.innerHTML = '';
                 const rows = Math.ceil(cleanText.length / cols);
-                const radius = 40; // 스키테일 반지름
-                // 2D 그리드 생성 (시각화용)
+                const radius = 40;
                 const grid = Array(rows).fill().map(() => Array(cols).fill(' '));
-                // 세로 방향으로 문자 채우기
                 let charIndex = 0;
                 for (let j = 0; j < cols && charIndex < cleanText.length; j++) {
                     for (let i = 0; i < rows && charIndex < cleanText.length; i++) {
                         grid[i][j] = cleanText[charIndex++];
                     }
                 }
-                // 스키테일에 문자 배치 (세로로 작성 - 열 단위)
                 for (let j = 0; j < cols; j++) {
                     for (let i = 0; i < rows; i++) {
                         const letter = grid[i][j];
@@ -458,7 +444,6 @@
                             letterElem.textContent = letter;
                             letterElem.style.width = '25px';
                             letterElem.style.height = '25px';
-                            // 스키테일에 문자 배치 (중심축에 맞게 조정)
                             const x = radius * Math.sin(angle);
                             const y = i * 30 + 10;
                             const z = radius * Math.cos(angle);
@@ -467,7 +452,6 @@
                         }
                     }
                 }
-                // 암호화된 텍스트를 풀었을 때 표시 (가로로 읽음)
                 const cipher = encrypt(text, cols);
                 for (let i = 0; i < cipher.length; i++) {
                     const letterElem = document.createElement('div');
@@ -475,7 +459,6 @@
                     letterElem.textContent = cipher[i];
                     unwrapped.appendChild(letterElem);
                 }
-                // 상태 업데이트
                 isWrapped = true;
                 unwrapped.style.display = 'none';
                 letterWrap.style.display = 'block';
@@ -495,14 +478,10 @@
                     return;
                 }
                 currentMessage = text;
-                // 그리드 시각화
                 const visualCipher = visualizeGrid(text, cols);
-                // 스키테일 시각화
                 currentCipher = placeLettersOnScytale(text, cols);
-                // 결과 표시
                 ciphertext.value = currentCipher;
                 decryptedtext.value = '';
-                // 초기 회전 각도 설정
                 rotationAngle = 0;
                 rodWrapper.style.transform = `rotateY(${rotationAngle}deg)`;
             });
@@ -516,7 +495,7 @@
                     return;
                 }
                 const decrypted = decrypt(cipher, cols);
-                decryptedtext.value = decrypted; // 복호화된 메시지 표시
+                decryptedtext.value = decrypted;
             });
 
             // 회전 버튼 클릭 이벤트 - 전체 막대를 회전
