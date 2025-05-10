@@ -3,543 +3,291 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>스키테일 암호 시뮬레이션</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    <title>스키테일 암호 시뮬레이터</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            font-family: 'Nanum Gothic', Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-            color: #333;
+            font-family: 'Inter', sans-serif; /* Tailwind's default sans-serif stack */
         }
-
-        h1, h2 {
-            color: #2c3e50;
-            text-align: center;
-        }
-
-        .container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .input-section, .output-section, .visualization-section {
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 16px;
-            font-family: 'Nanum Gothic', Arial, sans-serif;
-        }
-
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-            font-family: 'Nanum Gothic', Arial, sans-serif;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        .rod-container {
-            width: 100%;
-            height: 250px;
-            margin: 20px 0;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            perspective: 1000px;
-        }
-
-        .rod-wrapper {
-            width: 100px;
-            height: 200px;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.5s ease;
-        }
-
-        .scytale {
-            width: 80px;
-            height: 200px;
-            background-color: #a0522d;
-            border-radius: 40px;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            transform-style: preserve-3d;
-        }
-
-        .letter-wrap {
-            position: absolute;
-            width: 80px;
-            height: 200px;
-            left: 50%;
-            transform: translateX(-50%);
-            transform-style: preserve-3d;
-        }
-
-        .letter {
-            position: absolute;
-            background-color: #ffffcc;
-            border: 1px solid #ddd;
-            padding: 5px;
-            border-radius: 4px;
-            text-align: center;
-            transform-origin: center center;
-            font-size: 14px;
+        /* Custom style for grid cells to ensure visibility and consistent sizing */
+        .scytale-cell {
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.5s ease;
-            font-family: 'Nanum Gothic', Arial, sans-serif;
-            box-sizing: border-box; /* Ensure padding doesn't affect dimensions */
+            min-width: 28px; /* Minimum width for a cell */
+            min-height: 32px; /* Minimum height for a cell */
+            padding: 0.25rem; /* p-1 */
+            border: 1px solid #9CA3AF; /* border-gray-400 */
+            background-color: #FFFFFF; /* bg-white */
+            font-size: 0.875rem; /* text-sm */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-
-        .unwrapped {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-top: 20px;
-            justify-content: center;
+        @media (min-width: 768px) { /* md breakpoint */
+            .scytale-cell {
+                font-size: 1rem; /* text-base */
+                min-width: 32px;
+                min-height: 36px;
+            }
         }
-
-        .unwrapped .letter {
-            position: relative;
-            width: 25px; /* Increased width to handle wider characters */
-            height: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
+        /* Ensure buttons have good touch target size */
+        .action-button {
+            padding: 0.75rem 1.5rem; /* px-6 py-3 */
         }
-
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .explanation {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            border-left: 5px solid #3498db;
-            margin: 20px 0;
-            font-family: 'Nanum Gothic', Arial, sans-serif;
-        }
-
-        .steps {
-            counter-reset: step;
-            list-style-type: none;
-            padding-left: 10px;
-        }
-
-        .steps li {
-            position: relative;
-            padding-left: 30px;
-            margin-bottom: 10px;
-        }
-
-        .steps li:before {
-            content: counter(step);
-            counter-increment: step;
-            position: absolute;
-            left: 0;
-            top: 0;
-            background-color: #3498db;
-            color: white;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 20px;
-            font-size: 12px;
-            font-family: 'Nanum Gothic', Arial, sans-serif;
-        }
-
-        .grid-example {
-            margin: 15px 0;
-            font-family: monospace;
-            font-size: 16px;
-            line-height: 1.5;
-            white-space: pre;
-        }
-
-        /* 추가된 스타일 */
-        .grid-preview {
-            margin: 15px 0;
-            font-family: monospace;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
-            background-color: #f9f9f9;
-        }
-
-        .grid-row {
-            display: flex;
-            justify-content: flex-start;
-        }
-
-        .grid-cell {
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #ddd;
-            margin: 2px;
+        /* Style for the explanation box */
+        .explanation-box {
+            margin-top: 2rem; /* mt-8 */
+            padding: 1rem; /* p-4 */
+            border: 1px solid #93C5FD; /* border-blue-300 */
+            border-radius: 0.5rem; /* rounded-lg */
+            background-color: #EFF6FF; /* bg-blue-50 */
         }
     </style>
 </head>
-<body>
-    <h1>스키테일 암호 시뮬레이션</h1>
-    <div class="container">
-        <div class="explanation">
-            <h2>스키테일 암호란?</h2>
-            <p>스키테일(Scytale) 암호는 고대 스파르타에서 사용된 최초의 군사용 암호 시스템 중 하나입니다. 일정한 굵기의 막대(스키테일)에 가죽이나 양피지 띠를 감고 메시지를 <strong>세로로</strong> 작성한 다음, 띠를 풀어 <strong>가로로</strong> 읽으면 암호문이 됩니다. 메시지를 복호화하려면 수신자는 정확히 같은 굵기의 막대가 필요합니다.</p>
+<body class="bg-gray-50">
+    <div class="container mx-auto p-4 sm:p-6 max-w-3xl">
+        <header class="mb-6 sm:mb-8 text-center">
+            <h1 class="text-3xl sm:text-4xl font-bold text-blue-600">스키테일 암호 시뮬레이터</h1>
+            <p class="text-gray-600 mt-2">고대 암호화 기법을 직접 체험하고 원리를 배워보세요.</p>
+        </header>
 
-            <div class="grid-example">예시: "HELLO WORLD" (막대 둘레 3글자)<br>
-                막대에 감았을 때:<br>
-                H L <br>
-                E O <br>
-                L O <br>
-                L R <br>
-                O L <br>
-                W D<br>
-                <br>
-                띠를 풀면 암호문: HELLLO WOORLD
-            </div>
-        </div>
-
-        <div class="input-section">
-            <h2>암호화/복호화 설정</h2>
-            <div class="input-group">
-                <label for="plaintext">암호화할 메시지:</label>
-                <textarea id="plaintext" rows="3" placeholder="암호화할 메시지를 입력하세요">ABCDEFGHIJKLMN</textarea>
-            </div>
-
-            <div class="input-group">
-                <label for="diameter">스키테일 둘레 (열 수):</label>
-                <input type="number" id="diameter" min="2" max="10" value="3">
-            </div>
-
-            <div class="controls">
-                <button id="encrypt-btn">암호화</button>
-                <button id="decrypt-btn">복호화</button>
-                <button id="reset-btn">초기화</button>
-            </div>
-        </div>
-
-        <div class="grid-preview" id="grid-preview">
-            <h2>데이터 그리드 표시</h2>
-            <div id="grid-content"></div>
-        </div>
-
-        <div class="visualization-section">
-            <h2>시각화</h2>
-            <div class="rod-container">
-                <div class="rod-wrapper" id="rod-wrapper">
-                    <div class="scytale"></div>
-                    <div class="letter-wrap" id="letter-wrap"></div>
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="message" class="block text-lg font-medium text-gray-700 mb-2">평문 또는 암호문:</label>
+                    <textarea id="message" rows="3" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="여기에 메시지를 입력하세요..."></textarea>
+                </div>
+                <div>
+                    <label for="sides" class="block text-lg font-medium text-gray-700 mb-2">둘레 (막대 굵기/행의 수):</label>
+                    <input type="number" id="sides" value="4" min="2" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" title="최소 2 이상의 값을 입력하세요.">
                 </div>
             </div>
 
-            <div class="controls">
-                <button id="rotate-btn">회전</button>
-                <button id="unwrap-btn">풀기/감기</button>
+            <div class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4 mb-8">
+                <button id="encryptBtn" class="action-button w-full sm:w-auto bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-all duration-150 ease-in-out">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd" />
+                    </svg>
+                    암호화
+                </button>
+                <button id="decryptBtn" class="action-button w-full sm:w-auto bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 transition-all duration-150 ease-in-out">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 2a5 5 0 00-5 5v1h1a1 1 0 010 2H5v1a5 5 0 0010 0v-1h-.5a1 1 0 110-2H15V7a5 5 0 00-5-5zm0 4a1 1 0 100 2 1 1 0 000-2z" />
+                        <path fill-rule="evenodd" d="M5 10.5V16a2 2 0 002 2h6a2 2 0 002-2v-5.5H5zm3.5 1.5a.5.5 0 000 1h3a.5.5 0 000-1h-3z" clip-rule="evenodd" />
+                    </svg>
+                    복호화
+                </button>
             </div>
 
-            <div class="unwrapped" id="unwrapped"></div>
+            <div class="mb-6">
+                <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">스키테일 시각화:</h2>
+                <div id="scytaleGridWrapper" class="overflow-x-auto pb-2">
+                    <div id="scytaleGrid" class="grid gap-1 p-2 border border-gray-300 rounded-lg bg-gray-100 min-h-[120px] w-max min-w-full">
+                        <p class="text-gray-400 p-4 text-center col-span-full">여기에 스키테일 시각화가 표시됩니다.</p>
+                    </div>
+                </div>
+                <p id="gridAction" class="text-sm text-gray-600 mt-2 text-center min-h-[20px]"></p>
+            </div>
+
+            <div>
+                <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">결과:</h2>
+                <div id="result" class="w-full p-4 bg-gray-100 border border-gray-300 rounded-lg min-h-[60px] break-words text-gray-700"></div>
+                <p id="paddingInfo" class="text-sm text-red-500 mt-1 min-h-[20px]"></p>
+            </div>
         </div>
 
-        <div class="output-section">
-            <div class="input-group">
-                <label for="ciphertext">암호문:</label>
-                <textarea id="ciphertext" rows="3" readonly></textarea>
-            </div>
-
-            <div class="input-group">
-                <label for="decryptedtext">복호화된 메시지:</label>
-                <textarea id="decryptedtext" rows="3" readonly></textarea>
-            </div>
-        </div>
-
-        <div class="explanation">
-            <h2>작동 방식</h2>
-            <ol class="steps">
-                <li>메시지를 입력하고, 스키테일의 둘레(열 수)를 설정합니다.</li>
-                <li>'암호화' 버튼을 클릭하면 메시지가 스키테일에 <strong>세로로</strong> 작성됩니다.</li>
-                <li>메시지는 세로 방향으로 작성되고, 가로 방향으로 읽으면 암호문이 됩니다.</li>
-                <li>'회전' 버튼으로 스키테일을 돌려 다른 각도에서 메시지를 볼 수 있습니다.</li>
-                <li>'풀기/감기' 버튼으로 띠를 풀어 암호문을 확인하거나 다시 감을 수 있습니다.</li>
-                <li>'복호화' 버튼을 클릭하면 암호문이 다시 원래 메시지로 변환됩니다.</li>
-            </ol>
+        <div class="explanation-box">
+            <h3 class="text-xl font-semibold text-blue-700 mb-2">스키테일 암호란?</h3>
+            <p class="text-gray-700 leading-relaxed">
+                스키테일 암호는 고대 그리스(특히 스파르타)에서 사용된 것으로 알려진 치환 암호의 일종입니다. 메시지를 긴 양피지나 가죽끈에 적은 뒤, 특정 둘레(굵기)를 가진 원통형 막대(스키테일, Scytale)에 나선형으로 감습니다.
+                막대에 감긴 상태에서 가로줄을 따라 읽으면 의미 있는 메시지가 나타나지만, 가죽끈을 풀어서 펼치면 원래의 글자 순서가 흩어져 암호문처럼 보이게 됩니다. 암호문을 해독(복호화)하려면 암호화할 때 사용했던 것과 동일한 둘레의 막대가 필요합니다.
+            </p>
+            <p class="text-gray-700 mt-3"><strong>시뮬레이터 작동 방식:</strong></p>
+            <ul class="list-disc list-inside text-gray-700 ml-4 mt-1 space-y-1">
+                <li><strong>암호화:</strong> 입력된 평문을 스키테일 막대의 '둘레(행의 수)'에 맞춰, 마치 막대에 세로로 글자를 써 내려가듯 가상 격자에 채웁니다. (정확히는, 평문을 순서대로 격자의 첫 번째 열부터 아래로, 다음 열로 넘어가며 채웁니다.) 그런 다음, 격자의 각 행을 가로로 순서대로 읽어 암호문을 만듭니다. 이는 막대에 감긴 글자를 풀어서 한 줄로 읽는 과정을 나타냅니다.</li>
+                <li><strong>복호화:</strong> 입력된 암호문을 '둘레(행의 수)'에 맞춰 가상 격자의 각 행에 가로로 순서대로 채워 넣습니다. (이는 암호문이 적힌 띠를 다시 막대에 감는 과정을 나타냅니다.) 그런 다음, 격자의 각 열을 세로로 순서대로 읽어 원래의 평문을 얻습니다.</li>
+                <li><strong>패딩 문자:</strong> 평문의 길이가 '둘레(행의 수)'로 나누어 떨어지지 않으면, 암호화 과정에서 평문 끝에 밑줄(_) 문자를 추가하여 길이를 맞춥니다. 복호화 시 이 패딩 문자는 자동으로 제거됩니다.</li>
+            </ul>
+            <p class="text-gray-700 mt-3">
+                이 시뮬레이터를 통해 메시지와 막대의 둘레를 다양하게 변경해보면서 스키테일 암호의 원리를 직관적으로 이해해 보세요!
+            </p>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const plaintext = document.getElementById('plaintext');
-            const diameter = document.getElementById('diameter');
-            const ciphertext = document.getElementById('ciphertext');
-            const decryptedtext = document.getElementById('decryptedtext');
-            const encryptBtn = document.getElementById('encrypt-btn');
-            const decryptBtn = document.getElementById('decrypt-btn');
-            const resetBtn = document.getElementById('reset-btn');
-            const rotateBtn = document.getElementById('rotate-btn');
-            const unwrapBtn = document.getElementById('unwrap-btn');
-            const letterWrap = document.getElementById('letter-wrap');
-            const unwrapped = document.getElementById('unwrapped');
-            const rodWrapper = document.getElementById('rod-wrapper');
-            const gridContent = document.getElementById('grid-content');
+        // DOM Elements
+        const messageInput = document.getElementById('message');
+        const sidesInput = document.getElementById('sides');
+        const encryptBtn = document.getElementById('encryptBtn');
+        const decryptBtn = document.getElementById('decryptBtn');
+        const scytaleGrid = document.getElementById('scytaleGrid');
+        const gridActionEl = document.getElementById('gridAction');
+        const resultDiv = document.getElementById('result');
+        const paddingInfoEl = document.getElementById('paddingInfo');
+        const PADDING_CHAR = '_';
 
-            let isWrapped = true;
-            let rotationAngle = 0;
-            let currentMessage = '';
-            let currentCipher = '';
+        // Initial clear
+        clearGridAndResults();
 
-            // 암호화 함수 (올바른 스키테일 방식 - 세로로 작성, 가로로 읽기)
-            function encrypt(text, cols) {
-                const cleanText = text; // 띄어쓰기 제거 안함
-                const rows = Math.ceil(cleanText.length / cols);
-                const grid = Array(rows).fill().map(() => Array(cols).fill(' '));
-                let charIndex = 0;
-                for (let j = 0; j < cols && charIndex < cleanText.length; j++) {
-                    for (let i = 0; i < rows && charIndex < cleanText.length; i++) {
-                        grid[i][j] = cleanText[charIndex++];
+        // Event Listeners
+        encryptBtn.addEventListener('click', handleEncrypt);
+        decryptBtn.addEventListener('click', handleDecrypt);
+
+        function clearGridAndResults() {
+            scytaleGrid.innerHTML = '<p class="text-gray-400 p-4 text-center col-span-full">여기에 스키테일 시각화가 표시됩니다.</p>';
+            scytaleGrid.style.gridTemplateColumns = '1fr'; // Reset grid columns
+            gridActionEl.textContent = '';
+            resultDiv.textContent = '';
+            paddingInfoEl.textContent = '';
+        }
+        
+        function displayGrid(matrix, rows, cols, actionText) {
+            scytaleGrid.innerHTML = ''; // Clear previous grid
+            // Ensure grid adapts to content but has a min width via wrapper
+            scytaleGrid.style.gridTemplateColumns = `repeat(${cols}, minmax(28px, 1fr))`;
+            scytaleGrid.style.gridTemplateRows = `repeat(${rows}, minmax(32px, auto))`;
+            scytaleGrid.className = 'grid gap-1 p-2 border border-gray-300 rounded-lg bg-gray-100 w-max min-w-full';
+
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'scytale-cell'; // Using the CSS class
+                    cell.textContent = matrix[r]?.[c] || ''; 
+                    scytaleGrid.appendChild(cell);
+                }
+            }
+            gridActionEl.textContent = actionText;
+        }
+
+        function handleEncrypt() {
+            let originalText = messageInput.value;
+            const sides = parseInt(sidesInput.value);
+
+            clearGridAndResults(); // Clear previous state first
+
+            if (!originalText) {
+                resultDiv.textContent = "오류: 평문을 입력해주세요.";
+                resultDiv.classList.add('text-red-600');
+                return;
+            }
+            if (isNaN(sides) || sides < 2) {
+                resultDiv.textContent = "오류: 둘레(행의 수)는 2 이상의 유효한 숫자여야 합니다.";
+                resultDiv.classList.add('text-red-600');
+                return;
+            }
+            resultDiv.classList.remove('text-red-600');
+
+
+            const numRows = sides;
+            let paddedText = originalText;
+            let paddingAppliedInfo = "";
+
+            if (originalText.length % numRows !== 0) {
+                const paddingCount = numRows - (originalText.length % numRows);
+                paddedText += PADDING_CHAR.repeat(paddingCount);
+                paddingAppliedInfo = `정보: 평문 끝에 '${PADDING_CHAR}' 문자 ${paddingCount}개가 추가되어 길이가 ${numRows}의 배수(${paddedText.length}자)가 되도록 조정되었습니다.`;
+            }
+            paddingInfoEl.textContent = paddingAppliedInfo;
+            if (paddingAppliedInfo) paddingInfoEl.classList.remove('text-red-500');
+
+
+            const numCols = paddedText.length / numRows;
+            const grid = Array(numRows).fill(null).map(() => Array(numCols).fill(''));
+
+            // 암호화: 평문을 세로로(열 우선) 채워나간다.
+            let k = 0;
+            for (let c = 0; c < numCols; c++) { // 열 반복
+                for (let r = 0; r < numRows; r++) { // 행 반복
+                    if (k < paddedText.length) {
+                        grid[r][c] = paddedText[k++];
                     }
                 }
-                let result = '';
-                for (let i = 0; i < rows; i++) {
-                    for (let j = 0; j < cols; j++) {
-                        result += grid[i][j];
-                    }
-                }
-                return result;
             }
 
-            // 복호화 함수 (가로로 작성, 세로로 읽기)
-            function decrypt(cipher, cols) {
-                const totalChars = cipher.length;
-                const rows = Math.ceil(totalChars / cols);
-                const grid = Array(rows).fill().map(() => Array(cols).fill(' '));
-                let charIndex = 0;
-                for (let i = 0; i < rows; i++) {
-                    for (let j = 0; j < cols; j++) {
-                        if (charIndex < cipher.length) {
-                            grid[i][j] = cipher[charIndex++];
-                        }
+            displayGrid(grid, numRows, numCols, `암호화 과정: 평문(${originalText})을 ${numRows}행으로 세로로 배열`);
+
+            // 암호문: 가로로(행 우선) 읽는다.
+            let ciphertext = '';
+            for (let r = 0; r < numRows; r++) {
+                for (let c = 0; c < numCols; c++) {
+                    ciphertext += grid[r][c];
+                }
+            }
+            resultDiv.textContent = ciphertext;
+        }
+
+        function handleDecrypt() {
+            let ciphertext = messageInput.value;
+            const sides = parseInt(sidesInput.value);
+
+            clearGridAndResults(); // Clear previous state first
+
+            if (!ciphertext) {
+                resultDiv.textContent = "오류: 암호문을 입력해주세요.";
+                resultDiv.classList.add('text-red-600');
+                return;
+            }
+            if (isNaN(sides) || sides < 2) {
+                resultDiv.textContent = "오류: 둘레(행의 수)는 2 이상의 유효한 숫자여야 합니다.";
+                resultDiv.classList.add('text-red-600');
+                return;
+            }
+            resultDiv.classList.remove('text-red-600');
+
+            const numRows = sides;
+            let decryptionWarning = "";
+
+            if (ciphertext.length % numRows !== 0) {
+                decryptionWarning = `경고: 암호문의 길이(${ciphertext.length}자)가 둘레(${numRows})로 나누어 떨어지지 않습니다. 암호화 시 사용된 '둘레' 값과 다르거나 암호문이 변경되었을 수 있습니다. 결과가 정확하지 않을 수 있습니다.`;
+            }
+            paddingInfoEl.textContent = decryptionWarning;
+            if(decryptionWarning) paddingInfoEl.classList.add('text-red-500'); else paddingInfoEl.classList.remove('text-red-500');
+
+
+            // 복호화 시 열의 수는 암호문 길이와 행(둘레)에 따라 결정됨
+            const numCols = Math.ceil(ciphertext.length / numRows);
+            const grid = Array(numRows).fill(null).map(() => Array(numCols).fill(''));
+
+            // 복호화: 암호문을 가로로(행 우선) 채워나간다.
+            let k = 0;
+            for (let r = 0; r < numRows; r++) { // 행 반복
+                for (let c = 0; c < numCols; c++) { // 열 반복
+                    if (k < ciphertext.length) {
+                        grid[r][c] = ciphertext[k++];
+                    } else {
+                        grid[r][c] = ''; // 암호문 길이가 격자 크기보다 작을 경우 빈칸으로 채움
                     }
                 }
-                let result = '';
-                for (let j = 0; j < cols; j++) {
-                    for (let i = 0; i < rows; i++) {
-                        result += grid[i][j];
+            }
+            
+            displayGrid(grid, numRows, numCols, `복호화 과정: 암호문(${ciphertext})을 ${numRows}행으로 가로로 배열`);
+
+            // 평문: 세로로(열 우선) 읽는다.
+            let plaintext = '';
+            for (let c = 0; c < numCols; c++) {
+                for (let r = 0; r < numRows; r++) {
+                    if (grid[r][c]) { 
+                        plaintext += grid[r][c];
                     }
                 }
-                return result;
             }
 
-            // 그리드 시각화 함수
-            function visualizeGrid(text, cols) {
-                const rows = Math.ceil(text.length / cols);
-                const grid = Array(rows).fill().map(() => Array(cols).fill(' '));
-                let charIndex = 0;
-                for (let j = 0; j < cols && charIndex < text.length; j++) {
-                    for (let i = 0; i < rows && charIndex < text.length; i++) {
-                        grid[i][j] = text[charIndex++];
-                    }
-                }
-                gridContent.innerHTML = '<h3>세로로 작성된 메시지:</h3>';
-                const gridElement = document.createElement('div');
-                gridElement.className = 'grid';
-                for (let i = 0; i < rows; i++) {
-                    const rowElement = document.createElement('div');
-                    rowElement.className = 'grid-row';
-                    for (let j = 0; j < cols; j++) {
-                        const cellElement = document.createElement('div');
-                        cellElement.className = 'grid-cell';
-                        cellElement.textContent = grid[i][j];
-                        rowElement.appendChild(cellElement);
-                    }
-                    gridElement.appendChild(rowElement);
-                }
-                gridContent.appendChild(gridElement);
-                const readOrderElement = document.createElement('h3');
-                readOrderElement.textContent = '가로로 읽은 암호문:';
-                gridContent.appendChild(readOrderElement);
-                const cipherElement = document.createElement('div');
-                cipherElement.className = 'grid-row';
-                let cipher = '';
-                for (let i = 0; i < rows; i++) {
-                    for (let j = 0; j < cols; j++) {
-                        cipher += grid[i][j];
-                        const cellElement = document.createElement('div');
-                        cellElement.className = 'grid-cell';
-                        cellElement.textContent = grid[i][j];
-                        cellElement.style.backgroundColor = '#e0f7fa';
-                        cipherElement.appendChild(cellElement);
-                    }
-                }
-                gridContent.appendChild(cipherElement);
-                return cipher;
+            // 패딩 문자 제거
+            const finalPlaintext = plaintext.replace(new RegExp(PADDING_CHAR + '+$'), '');
+            
+            resultDiv.textContent = finalPlaintext;
+            if (plaintext !== finalPlaintext && plaintext.includes(PADDING_CHAR)) {
+                 const removedInfo = `정보: 복호화된 평문에서 후행 '${PADDING_CHAR}' 문자가 제거되었습니다.`;
+                 if(paddingInfoEl.textContent) {
+                    paddingInfoEl.textContent += " " + removedInfo;
+                 } else {
+                    paddingInfoEl.textContent = removedInfo;
+                    paddingInfoEl.classList.remove('text-red-500'); // Ensure it's not red if only this info
+                 }
             }
-
-            // 스키테일에 문자 배치 (세로 방향으로 작성)
-            function placeLettersOnScytale(text, cols) {
-                const cleanText = text; // 띄어쓰기 제거 안함
-                letterWrap.innerHTML = '';
-                unwrapped.innerHTML = '';
-                const rows = Math.ceil(cleanText.length / cols);
-                const radius = 40;
-                const grid = Array(rows).fill().map(() => Array(cols).fill(' '));
-                let charIndex = 0;
-                for (let j = 0; j < cols && charIndex < cleanText.length; j++) {
-                    for (let i = 0; i < rows && charIndex < cleanText.length; i++) {
-                        grid[i][j] = cleanText[charIndex++];
-                    }
-                }
-                for (let j = 0; j < cols; j++) {
-                    for (let i = 0; i < rows; i++) {
-                        const letter = grid[i][j];
-                        if (letter !== ' ') {
-                            const angle = (j / cols) * 2 * Math.PI;
-                            const letterElem = document.createElement('div');
-                            letterElem.className = 'letter';
-                            letterElem.textContent = letter;
-                            letterElem.style.width = '25px';
-                            letterElem.style.height = '25px';
-                            const x = radius * Math.sin(angle);
-                            const y = i * 30 + 10;
-                            const z = radius * Math.cos(angle);
-                            letterElem.style.transform = `translate3d(${x}px, ${y}px, ${z}px) rotateY(${angle}rad)`;
-                            letterWrap.appendChild(letterElem);
-                        }
-                    }
-                }
-                const cipher = encrypt(text, cols);
-                for (let i = 0; i < cipher.length; i++) {
-                    const letterElem = document.createElement('div');
-                    letterElem.className = 'letter';
-                    letterElem.textContent = cipher[i];
-                    unwrapped.appendChild(letterElem);
-                }
-                isWrapped = true;
-                unwrapped.style.display = 'none';
-                letterWrap.style.display = 'block';
-                return cipher;
-            }
-
-            // 암호화 버튼 클릭 이벤트
-            encryptBtn.addEventListener('click', function() {
-                const text = plaintext.value;
-                const cols = parseInt(diameter.value);
-                if (text.trim() === '') {
-                    alert('암호화할 메시지를 입력하세요.');
-                    return;
-                }
-                if (cols < 2 || cols > 10) {
-                    alert('스키테일 둘레(열 수)는 2에서 10 사이여야 합니다.');
-                    return;
-                }
-                currentMessage = text;
-                const visualCipher = visualizeGrid(text, cols);
-                currentCipher = placeLettersOnScytale(text, cols);
-                ciphertext.value = currentCipher;
-                decryptedtext.value = '';
-                rotationAngle = 0;
-                rodWrapper.style.transform = `rotateY(${rotationAngle}deg)`;
-            });
-
-            // 복호화 버튼 클릭 이벤트
-            decryptBtn.addEventListener('click', function() {
-                const cipher = ciphertext.value;
-                const cols = parseInt(diameter.value);
-                if (cipher.trim() === '') {
-                    alert('암호문이 없습니다. 먼저 암호화를 진행하세요.');
-                    return;
-                }
-                const decrypted = decrypt(cipher, cols);
-                decryptedtext.value = decrypted;
-            });
-
-            // 회전 버튼 클릭 이벤트 - 전체 막대를 회전
-            rotateBtn.addEventListener('click', function() {
-                rotationAngle += 45;
-                rodWrapper.style.transform = `rotateY(${rotationAngle}deg)`;
-            });
-
-            // 풀기/감기 버튼 클릭 이벤트
-            unwrapBtn.addEventListener('click', function() {
-                if (isWrapped) {
-                    // 풀기
-                    letterWrap.style.display = 'none';
-                    unwrapped.style.display = 'flex';
-                    unwrapBtn.textContent = '감기';
-                } else {
-                    // 감기
-                    letterWrap.style.display = 'block';
-                    unwrapped.style.display = 'none';
-                    unwrapBtn.textContent = '풀기';
-                }
-                isWrapped = !isWrapped;
-            });
-
-            // 초기화 버튼 클릭 이벤트
-            resetBtn.addEventListener('click', function() {
-                plaintext.value = 'ABCDEFGHIJKLMN';
-                diameter.value = 3;
-                ciphertext.value = '';
-                decryptedtext.value = '';
-                letterWrap.innerHTML = '';
-                unwrapped.innerHTML = '';
-                gridContent.innerHTML = '';
-                isWrapped = true;
-                rotationAngle = 0;
-                rodWrapper.style.transform = `rotateY(${rotationAngle}deg)`;
-                letterWrap.style.display = 'block';
-                unwrapped.style.display = 'none';
-                unwrapBtn.textContent = '풀기';
-            });
-
-            // 초기 시뮬레이션 설정
-            encryptBtn.click();
-        });
+        }
     </script>
 </body>
 </html>
